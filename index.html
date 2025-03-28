@@ -223,7 +223,7 @@
             <h1>我的导航</h1>
             <div class="search-box">
                 <div class="search-container">
-                    <input type="text" class="search-input" placeholder="输入关键词搜索..." id="searchInput">
+                    <input type="text" id="searchInput" class="search-input" placeholder="输入搜索关键词...">
                     <button class="search-button active" data-engine="baidu">百度</button>
                     <button class="search-button" data-engine="google">谷歌</button>
                 </div>
@@ -236,6 +236,43 @@
 
         <script src="data.js"></script>
         <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('searchInput');
+                const searchButtons = document.querySelectorAll('.search-button');
+                let currentEngine = 'baidu';
+
+                // 执行搜索的函数
+                function performSearch() {
+                    const searchTerm = searchInput.value.trim();
+                    if (searchTerm) {
+                        const searchUrl = currentEngine === 'baidu' 
+                            ? `https://www.baidu.com/s?wd=${encodeURIComponent(searchTerm)}` 
+                            : `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
+                        window.open(searchUrl, '_blank');
+                    }
+                }
+
+                // 切换搜索引擎
+                searchButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        searchButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        currentEngine = button.dataset.engine;
+                        performSearch(); // 点击搜索引擎按钮时立即执行搜索
+                    });
+                });
+
+                // 处理搜索框回车事件
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        performSearch();
+                    }
+                });
+            });
+
+            // 渲染书签
             // 渲染书签
             function renderBookmarks() {
                 const grid = document.getElementById('bookmarksGrid');
@@ -333,123 +370,125 @@
         </div>
     </div>
 
-    <script src="data.js">
-        // 初始化书签数据
-        let bookmarks = defaultBookmarks;
+    <script src="data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchButtons = document.querySelectorAll('.search-button');
+            let currentEngine = 'baidu';
 
-        // 从localStorage加载书签
-        function loadBookmarks() {
-            const savedBookmarks = localStorage.getItem('bookmarks');
-            if (savedBookmarks) {
-                bookmarks = JSON.parse(savedBookmarks);
-                renderBookmarks();
+            // 执行搜索的函数
+            function performSearch() {
+                const searchTerm = searchInput.value.trim();
+                if (searchTerm) {
+                    const searchUrl = currentEngine === 'baidu'
+                        ? `https://www.baidu.com/s?wd=${encodeURIComponent(searchTerm)}`
+                        : `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
+                    window.open(searchUrl, '_blank');
+                }
             }
-        }
 
-        // 保存书签到localStorage
-        function saveBookmarks() {
-            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-        }
-
-        // 渲染书签
-        function renderBookmarks(filteredBookmarks = bookmarks) {
-            const grid = document.getElementById('bookmarksGrid');
-            grid.innerHTML = '';
-
-            filteredBookmarks.forEach((bookmark, index) => {
-                const card = document.createElement('div');
-                card.className = 'bookmark-card';
-                card.innerHTML = `
-                    <h3>${bookmark.title}</h3>
-                    <a href="${bookmark.url}" target="_blank">${bookmark.url}</a>
-                `;
-                grid.appendChild(card);
+            // 切换搜索引擎
+            searchButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    searchButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    currentEngine = button.dataset.engine;
+                    performSearch(); // 点击搜索引擎按钮时立即执行搜索
+                });
             });
-        }
 
-        // 搜索功能
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredBookmarks = bookmarks.filter(bookmark => 
-                bookmark.title.toLowerCase().includes(searchTerm) ||
-                bookmark.url.toLowerCase().includes(searchTerm)
-            );
-            renderBookmarks(filteredBookmarks);
-        });
+            // 处理搜索框回车事件
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch();
+                }
+            });
 
-        // 添加书签相关功能
-        const modal = document.getElementById('addBookmarkModal');
-        const addBtn = document.getElementById('addBookmarkBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const form = document.getElementById('addBookmarkForm');
+            // 初始化书签数据
+            let bookmarks = defaultBookmarks;
 
-        addBtn.addEventListener('click', () => {
-            modal.style.display = 'flex';
-        });
+            // 从localStorage加载书签
+            function loadBookmarks() {
+                const savedBookmarks = localStorage.getItem('bookmarks');
+                if (savedBookmarks) {
+                    bookmarks = JSON.parse(savedBookmarks);
+                    renderBookmarks();
+                }
+            }
 
-        cancelBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-            form.reset();
-        });
+            // 保存书签到localStorage
+            function saveBookmarks() {
+                localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            }
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const title = document.getElementById('bookmarkTitle').value;
-            const url = document.getElementById('bookmarkUrl').value;
+            // 渲染书签
+            function renderBookmarks(filteredBookmarks = bookmarks) {
+                const grid = document.getElementById('bookmarksGrid');
+                grid.innerHTML = '';
 
-            bookmarks.push({ title, url });
-            saveBookmarks();
-            renderBookmarks();
+                filteredBookmarks.forEach((bookmark, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'bookmark-card';
+                    card.innerHTML = `
+                        <h3>${bookmark.title}</h3>
+                        <a href="${bookmark.url}" target="_blank">${bookmark.url}</a>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
 
-            modal.style.display = 'none';
-            form.reset();
-        });
+            // 搜索功能
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredBookmarks = bookmarks.filter(bookmark => 
+                    bookmark.title.toLowerCase().includes(searchTerm) ||
+                    bookmark.url.toLowerCase().includes(searchTerm)
+                );
+                renderBookmarks(filteredBookmarks);
+            });
 
-        // 点击modal外部关闭
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
+            // 添加书签相关功能
+            const modal = document.getElementById('addBookmarkModal');
+            const addBtn = document.getElementById('addBookmarkBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const form = document.getElementById('addBookmarkForm');
+
+            addBtn.addEventListener('click', () => {
+                modal.style.display = 'flex';
+            });
+
+            cancelBtn.addEventListener('click', () => {
                 modal.style.display = 'none';
                 form.reset();
-            }
-        });
+            });
 
-        // 初始化加载
-        loadBookmarks();
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('bookmarkTitle').value;
+                const url = document.getElementById('bookmarkUrl').value;
+
+                bookmarks.push({ title, url });
+                saveBookmarks();
+                renderBookmarks();
+
+                modal.style.display = 'none';
+                form.reset();
+            });
+
+            // 点击modal外部关闭
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    form.reset();
+                }
+            });
+
+            // 初始化加载
+            loadBookmarks();
+        });
     </script>
 </body>
 </html>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const searchButtons = document.querySelectorAll('.search-button');
-    let currentEngine = 'baidu';
-
-    // 执行搜索的函数
-    function performSearch() {
-        const searchTerm = searchInput.value.trim();
-        if (searchTerm) {
-            const searchUrl = currentEngine === 'baidu'
-                ? `https://www.baidu.com/s?wd=${encodeURIComponent(searchTerm)}`
-                : `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
-            window.open(searchUrl, '_blank');
-        }
-    }
-
-    // 切换搜索引擎
-    searchButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            searchButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            currentEngine = button.dataset.engine;
-            performSearch(); // 点击搜索引擎按钮时立即执行搜索
-        });
-    });
-
-    // 处理搜索框回车事件
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            performSearch();
-        }
-    });
-});
